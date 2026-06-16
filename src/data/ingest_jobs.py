@@ -8,7 +8,7 @@ load_dotenv()
 logger = get_logger(__name__)
 
 
-def initialize_workflow(roles, countries):
+def initialize_workflow(roles, countries, page, num_pages):
     conn = None
 
     try:
@@ -26,7 +26,7 @@ def initialize_workflow(roles, countries):
                 logger.info(f"Processing query: {search_query}")
 
                 try:
-                    jobs = fetch_jobs_from_api(search_query)
+                    jobs = fetch_jobs_from_api(search_query, page, num_pages)
 
                     if not jobs:
                         logger.warning(f"No jobs returned for query: {search_query}")
@@ -51,14 +51,35 @@ def initialize_workflow(roles, countries):
 
 if __name__ == "__main__":
     roles = [
+        "Data Analyst",
         "Data Scientist",
-        "Data Analyst"
+        "Data Engineer",
+        "Machine Learning Engineer",
+        "AI Engineer",
+        "Business Intelligence Analyst",
+        "Analytics Engineer",
+        "MLOps Engineer",
+        "Data Architect"
     ]
 
     countries = [
-        "United Arab Emirates",
+        "USA",
+        "Canada",
+        "UK",
+        "Germany",
+        "France",
+        "Netherlands",
+        "India",
+        "Singapore",
+        "Australia",
         "Saudi Arabia",
-        "Qatar"
+        "Qatar",
+        "Kuwait",
+        "Bahrain",
+        "Oman"
     ]
 
-    initialize_workflow(roles, countries)
+    page = 1
+    num_pages = 3
+
+    initialize_workflow(roles, countries, page, num_pages)

@@ -41,7 +41,7 @@ def create_raw_table(conn):
 
     try:
         create_table = """
-            CREATE TABLE IF NOT EXISTS raw_job_postings (
+            CREATE TABLE IF NOT EXISTS raw_job_postings_new (
                 id BIGSERIAL PRIMARY KEY,
                 source_job_id TEXT,
                 search_query TEXT,
@@ -81,7 +81,7 @@ def insert_jobs(conn, jobs, search_query):
     logger.info("Starting job insertion into raw_job_postings...")
 
     insert_query = """
-        INSERT INTO raw_job_postings (
+        INSERT INTO raw_job_postings_new (
             source_job_id,
             search_query,
             job_title,
@@ -142,7 +142,7 @@ def insert_jobs(conn, jobs, search_query):
                 cursor.execute(insert_query, values)
 
         conn.commit()
-        logger.info(f"Successfully inserted {len(jobs)} job(s) into raw_job_postings.")
+        logger.info(f"Successfully inserted {len(jobs)} job(s) into raw_job_postings_new.")
 
     except Exception as e:
         conn.rollback()
