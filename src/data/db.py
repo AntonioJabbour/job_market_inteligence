@@ -41,7 +41,7 @@ def create_raw_table(conn):
 
     try:
         create_table = """
-            CREATE TABLE IF NOT EXISTS raw_job_postings_new (
+            CREATE TABLE IF NOT EXISTS raw_job_postings (
                 id BIGSERIAL PRIMARY KEY,
                 source_job_id TEXT,
                 search_query TEXT,
@@ -51,6 +51,7 @@ def create_raw_table(conn):
                 job_city TEXT,
                 job_state TEXT,
                 job_country TEXT,
+                job_location TEXT,
                 employment_type TEXT,
                 is_remote BOOLEAN,
                 posted_at_utc TIMESTAMPTZ,
@@ -81,7 +82,7 @@ def insert_jobs(conn, jobs, search_query):
     logger.info("Starting job insertion into raw_job_postings...")
 
     insert_query = """
-        INSERT INTO raw_job_postings_new (
+        INSERT INTO raw_job_postings (
             source_job_id,
             search_query,
             job_title,
@@ -90,6 +91,7 @@ def insert_jobs(conn, jobs, search_query):
             job_city,
             job_state,
             job_country,
+            job_location,
             employment_type,
             is_remote,
             posted_at_utc,
@@ -107,7 +109,8 @@ def insert_jobs(conn, jobs, search_query):
             %s, %s, %s, %s, %s,
             %s, %s, %s, %s, %s,
             %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s
+            %s, %s, %s, %s, %s,
+            %s
         );
     """
 
@@ -124,7 +127,8 @@ def insert_jobs(conn, jobs, search_query):
                     job.get("employer_website"),             
                     job.get("job_city"),                       
                     job.get("job_state"),                      
-                    job.get("job_country"),                   
+                    job.get("job_country"),    
+                    job.get("job_location"),               
                     job.get("job_employment_type"),           
                     job.get("job_is_remote"),                  
                     job.get("job_posted_at_datetime_utc"),     

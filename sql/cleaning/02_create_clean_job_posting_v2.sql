@@ -22,6 +22,7 @@ SELECT
     clean_job_title,
     company_name,
     job_country,
+    job_location,
     employment_type,
     is_remote,
     job_description,
