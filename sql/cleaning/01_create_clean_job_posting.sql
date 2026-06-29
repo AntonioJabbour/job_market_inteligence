@@ -14,3 +14,13 @@ SELECT
     TRIM(LOWER(job_source)) AS job_source,
     posted_at_utc
 FROM raw_job_postings;
+
+SELECT * FROM clean_job_posting;
+
+
+UPDATE clean_job_posting JP
+SET job_country = (SELECT CR.COUNTRY_CODE 
+	   									   FROM country_reference cr
+	   									   WHERE UPPER(jp.job_location) LIKE '%' || UPPER(cr.country_name) || '%')
+WHERE JOB_COUNTRY IS NULL;
+
