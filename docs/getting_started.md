@@ -57,7 +57,18 @@ See [Data dictionary and KPIs](data_dictionary.md) for formulas. A report file i
 The existing SQL pipeline expects additional setup. Use a dedicated development database because cleaning scripts drop and rebuild derived tables.
 
 1. Create a PostgreSQL database.
-2. Copy `.env.example` to `.env`.
+2. Create a local `.env` file in the repository root. Add the following variable names and supply your own values:
+
+   ```dotenv
+   JSEARCH_API_KEY=
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=job_market_db
+   DB_USER=postgres
+   DB_PASSWORD=
+   APP_ENV=development
+   LOG_LEVEL=INFO
+   ```
 3. Set `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`. Set `JSEARCH_API_KEY` only if collecting new listings.
 4. Before ingestion, review `src/data/ingest_jobs.py`: it currently loops over 9 roles and 14 countries with `num_pages=3`. Reduce scope for a first run and check your provider quota.
 5. Explicitly run collection from the repository root:
@@ -93,6 +104,6 @@ The current processed CSV uses eight differently named extracted columns, so the
 
 ## Credentials and data usage
 
-Keep credentials in the ignored local `.env`. Never insert real credentials into `.env.example`. Rotate any credentials that were previously committed; replacing the current file does not erase history.
+Keep credentials in the ignored local `.env`; do not commit environment files. The previously tracked environment example has been removed. Rotate any credentials that were previously committed; deleting a file does not erase Git history.
 
 The repository's `LICENSE` file is currently empty, so it does not grant an explicit open-source license. An owner-selected license and confirmation of API/data redistribution terms are still needed.
