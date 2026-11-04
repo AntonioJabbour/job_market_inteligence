@@ -104,7 +104,7 @@ See the [data dictionary](docs/data_dictionary.md) for metric definitions and DA
 - The legacy classifier's small test set is not evidence of production performance.
 - Next priorities: audit extraction quality, retain stable posting identifiers, improve deduplication, record collection provenance, and build the Power BI report.
 
-Configuration belongs in a local `.env`; the tracked [.env.example](.env.example) contains blank credential fields. A non-empty example was replaced during repository cleanup. Any previously exposed credentials must be rotated, since historical commits may retain them.
+Configuration belongs in an ignored local `.env`. Create it using the variable names in the [setup guide](docs/getting_started.md). No environment example is tracked. Any previously exposed credentials must be rotated, since historical commits may retain them.
 
 ## Author
 
