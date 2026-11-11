@@ -1,111 +1,73 @@
 # Job Market Intelligence
 
-**A Data Analyst portfolio project using Python, PostgreSQL, and Power BI-ready data to explore skills mentioned in Data and AI job postings.**
+**End-to-end analytics pipeline that turns raw Data & AI job postings into clean, BI-ready tables of roles and skills.**
 
-The project turns API job listings into standardized roles, extracts technical terms from descriptions, and prepares related jobs and skills tables for business intelligence reporting.
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-150458?logo=pandas&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black)
+
+Job postings are collected from the JSearch API, loaded into PostgreSQL, cleaned and standardized with SQL, and analyzed in Python. The output is a related **jobs** and **skills** table pair ready for Power BI.
+
+## Key results
+
+| Metric | Result |
+|---|---:|
+| Job postings analyzed | **1,044** |
+| Standardized role categories | **9** |
+| Job–skill records prepared for Power BI | **5,865** |
+| Postings matched to at least one programming language | **793 (76%)** |
+| Largest role category in the sample | AI Engineer (224 postings) |
+| Postings flagged remote | 49 (4.7%) |
+
+**Data quality findings:** 94% of postings had no city-level location, 30% had no posting timestamp, and 6% had no country. These gaps are documented so that country and time filters in reports can account for them rather than silently dropping records.
 
 ## Business questions
 
-- Which skills are mentioned in the collected postings?
-- How do role counts and remote flags vary within the sample?
-- Which data quality issues could affect comparisons?
-- How can job and skill records be modeled for interactive reporting?
+- Which technical skills are most often mentioned for each data role?
+- How do role mix and remote availability vary across the sample?
+- Which data quality issues could distort comparisons, and how should a report handle them?
+- How should job and skill data be modeled for interactive reporting?
 
-**Tools:** Python · SQL · PostgreSQL · pandas · regular expressions · scikit-learn · Power BI data preparation
+## Pipeline
 
-## Start here
+```
+JSearch API ──► PostgreSQL (raw) ──► SQL cleaning & title mapping ──► Python EDA & skill extraction ──► Power BI tables
+```
 
-| Resource | What it shows |
-|---|---|
-| [Exploratory analysis](notebooks/01_initial_eda.ipynb) | Data quality checks, role and country counts, remote flags, and dictionary-based skill extraction |
-| [Power BI preparation](notebooks/02_powerbi_preparation.ipynb) | Jobs and skills tables with relationship checks |
-| [Setup guide](docs/getting_started.md) | Explore the included CSVs or run the database workflow |
-| [Data dictionary and KPIs](docs/data_dictionary.md) | Table grain, relationships, field definitions, and reporting measures |
-| [SQL cleaning](sql/cleaning) | Normalization and role standardization |
-| [Original project definition](docs/project_definition.md) | Longer-term objectives, including features not yet delivered |
+1. **Collect:** Python API client with ingestion into PostgreSQL ([`src/data/`](src/data)).
+2. **Clean:** SQL normalizes text and maps free-text job titles to 9 standard roles ([`sql/cleaning/`](sql/cleaning)), followed by validation queries ([`sql/validation/`](sql/validation)).
+3. **Analyze:** Data quality checks plus regex/dictionary skill extraction across 8 skill categories ([EDA notebook](notebooks/01_initial_eda.ipynb)).
+4. **Model for BI:** One-to-many jobs → skills tables with relationship checks ([Power BI prep notebook](notebooks/02_powerbi_preparation.ipynb)).
 
-## Snapshot from saved analysis
+## Explore it in 2 minutes (no API key needed)
 
-These figures come from **saved notebook outputs**, not a fresh API collection or independent re-execution of the database pipeline.
+The processed outputs are included:
 
-| Measure | Saved result | Interpretation |
-|---|---:|---|
-| Analyzed job records | 1,044 | Size of the cleaned sample, not total market vacancies |
-| Standardized role categories | 9 | Includes Data Analyst, Data Scientist, Data Engineer, and AI roles |
-| Data Analyst records | 150 | Count within the sampled listings |
-| AI Engineer records | 224 | Largest role category in this sample |
-| Records flagged remote | 49 | About 4.69% of all 1,044 records; a false flag does not prove a role is on-site |
-| Skill records prepared for Power BI | 5,865 | Job–skill–category records, not distinct jobs |
-| Jobs with a programming-language dictionary match | 793 (75.96%) | Extraction coverage, not extraction accuracy |
+- [`notebooks/jobs_table.csv`](notebooks/jobs_table.csv): one row per job
+- [`notebooks/skills_table.csv`](notebooks/skills_table.csv): one row per job–skill mention
+- [`notebooks/processed_job_data.csv`](notebooks/processed_job_data.csv): full cleaned dataset
 
-**Business implication:** The sample can help prioritize a deeper review of skills for a chosen role. It cannot establish overall hiring demand or a market trend without representative sampling and comparable collection periods.
+**Power BI:** import both tables and relate `jobs_table[job_id]` → `skills_table[job_id]` (one-to-many). Use `DISTINCTCOUNT(job_id)` for job-level measures, because counting skill rows would inflate posting counts. Measure definitions and DAX examples are in the [data dictionary](docs/data_dictionary.md).
 
-## Data quality findings
+To rerun the full pipeline (API key and PostgreSQL required), follow the [setup guide](docs/getting_started.md). Credentials go in a local `.env` file, which is git-ignored.
 
-The saved EDA reports:
-
-- **62 missing country values** (5.94%).
-- **981 missing location values** (93.97%).
-- **308 missing posting timestamps** (29.50%).
-- **7 missing employment types** (0.67%).
-- No full-row duplicates in the analyzed cleaned table.
-
-Country and time filters therefore need explicit missing-data handling. The [initial raw-data quality report](docs/data_quality_report.md) also records unusable salary fields in that earlier assessment; salary benchmarking is not a demonstrated result of this version.
-
-## Workflow and delivery status
-
-1. **Collect:** JSearch client and PostgreSQL ingestion scripts.
-2. **Clean:** SQL normalizes text and maps titles to role categories.
-3. **Analyze:** The EDA notebook checks quality and extracts terms across eight skill categories.
-4. **Prepare reporting:** The Power BI notebook exports jobs and skills tables.
-5. **Explore modeling:** An older notebook compares job-role classifiers on a different, smaller dataset.
-
-| Component | Current status |
-|---|---|
-| Python ingestion and SQL scripts | Included; require API access, PostgreSQL, and setup |
-| Processed data and Power BI CSV exports | Included in `notebooks/` |
-| Interactive Power BI report | No `.pbix` file or published dashboard is included |
-| Machine-learning experiment | Legacy 54-record experiment; incompatible with the current extracted-column schema without adaptation |
-| Salary prediction and role clustering | Longer-term objectives, not completed features demonstrated here |
-
-## Explore without an API key
-
-The included exports let you inspect the project without collecting new data:
-
-- [Processed job data](notebooks/processed_job_data.csv)
-- [Jobs table](notebooks/jobs_table.csv)
-- [Skills table](notebooks/skills_table.csv)
-
-For Power BI, import the jobs and skills CSVs and create a **one-to-many** relationship from `jobs_table[job_id]` to `skills_table[job_id]`. Use distinct job counts for job-level measures; counting skill rows inflates posting counts.
-
-See the [data dictionary](docs/data_dictionary.md) for metric definitions and DAX examples, and the [setup guide](docs/getting_started.md) to regenerate the exports.
-
-## Repository guide
+## Repository structure
 
 | Path | Purpose |
 |---|---|
-| `src/data/` | API client, database access, ingestion, and SQL runner |
-| `src/utils/` | Logging |
-| `sql/exploration/` | Raw-data profiling queries |
-| `sql/cleaning/` | Cleaning and title mapping scripts |
-| `sql/validation/` | Post-cleaning checks |
-| `notebooks/` | Analysis, reporting preparation, and CSV exports |
-| `data/reference/` | Country reference data and inspection notebook |
-| `models/` | Artifacts from the legacy classifier experiment |
-| `docs/` | Setup, definitions, quality assessment, and original plans |
-| `tests/` | Manual API/database checks; some call external services and write data |
+| `src/data/` | API client, database access, ingestion, SQL runner |
+| `sql/exploration/` · `sql/cleaning/` · `sql/validation/` | Profiling, cleaning and validation queries |
+| `notebooks/` | EDA, Power BI preparation, CSV exports |
+| `docs/` | Setup guide, data dictionary, schema design, data quality report |
+| `tests/` | Manual API and database checks |
 
-## Limitations and next steps
+## Limitations & next steps
 
-- API search queries, pagination, provider coverage, and repeated listings affect sample composition.
-- Dictionary matching detects mentions rather than verified requirements or skill proficiency. Aliases, context, and punctuation-sensitive terms need validation.
-- The ingestion layer does not enforce a unique source-job constraint; repeated runs can add duplicates.
-- Exported `job_id` values are generated from row order and are not stable source identifiers.
-- The legacy classifier's small test set is not evidence of production performance.
-- Next priorities: audit extraction quality, retain stable posting identifiers, improve deduplication, record collection provenance, and build the Power BI report.
-
-Configuration belongs in an ignored local `.env`. Create it using the variable names in the [setup guide](docs/getting_started.md). No environment example is tracked. Any previously exposed credentials must be rotated, since historical commits may retain them.
+- The sample reflects API search queries and collection timing, not the full job market, so results describe the sample rather than overall hiring demand.
+- Dictionary matching captures skill *mentions*, not verified requirements; extraction accuracy still needs a manual audit.
+- Next: stable source IDs and deduplication on ingestion, an extraction-quality audit, and a published Power BI dashboard.
 
 ## Author
 
-**Antonio Jabbour** — Data Analyst portfolio
+**Antonio Jabbour**, Data Analyst · [GitHub](https://github.com/AntonioJabbour)
